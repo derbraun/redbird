@@ -10,7 +10,7 @@ app.use(express.static('public'));
 
 //Knex Setup
 const env = process.env.NODE_ENV || 'development';
-const config = require('/knexfile')[env];
+const config = require('./knexfile')[env];
 const knex = require('knex')(config);
 
 //bcrypt setup
@@ -55,7 +55,7 @@ app.post('/api/users', (req, res) => {
 
     //Check that the request includes all the necessary information, and return an error if not.
     if (!req.body.email || !req.body.password || !req.body.username || !req.body.name)
-        return res.status(400).send();\
+        return res.status(400).send();
 
     //Check if a user already exists with the given email address, and return an error if so.
     knex('users').where('email',req.body.email).first().then(user => {
@@ -82,7 +82,7 @@ app.post('/api/users', (req, res) => {
 
         // Find the record of the new user in the database.
     }).then(ids => {
-        return knex('users').where('id',ids[0]).first();\
+        return knex('users').where('id',ids[0]).first();
 
         // Return 200.
     }).then(user => {

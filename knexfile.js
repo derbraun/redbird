@@ -6,8 +6,8 @@ module.exports = {
     client: 'mariasql',
     connection: {
       host	: '127.0.0.1',
-      user	: 'root',
-      password	: 'das1stderh@mmer',
+      user	: 'programmer',
+      password	: 'programmer162',
       db	: 'redbird',
       charset	: 'utf8'
     }

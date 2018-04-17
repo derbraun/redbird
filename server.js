@@ -137,4 +137,81 @@ app.post('/api/users/:id/tweets', (req, res) => {
     });
 });
 
+//Search tweets
+app.get('/api/tweets/search', (req, res) =>{
+
+    if( !req.query.keywords)
+        return res.status(400).send();
+
+    //If query has an offset set it, otherwise offset is 0
+    let offset = 0;
+    if(req.query.offset)
+        offset = parseInt(req.query.offset);
+
+    //If query has a limit, set it. Otherwise limit is 50
+    let limit = 50;
+    if(req.query.limit)
+        limit = parseInt(req.query.limit);
+
+    //Create Join of users and tweets
+    knex('users').join('tweets','users.id','tweets.user_id')
+        //Checking where tweet matches keywords
+        .whereRaw("MATCH (tweet) AGAINST('" + req.query.keywords + "')")
+
+        //Other params
+        .orderBy('created','desc')
+        .limit(limit)
+        .offset(offset)
+        .select('tweet','username','name','created','users.id as userID').then(tweets => {
+        res.status(200).json({tweets:tweets});
+    }).catch(error => {
+
+        //All other errors return 500 error
+        res.status(500).json({ error });
+    });
+});
+
+//Add Hashtags
+app.get('/api/tweets/hash/:hashtag', (req, res) => {
+
+    //if query has offset set it, otherwise offset is 0
+    let offset = 0;
+    if (req.query.offset)
+        offset = parseInt(req.query.offset);
+
+    //if query has a limit, set it. Otherwise, limit is 50
+    let limit = 50;
+    if (req.query.limit)
+        limit = parseInt(req.query.limit);
+
+    //Create Join of tweets and users
+    knex('users').join('tweets','users.id','tweets.user_id')
+        ///Checking for hashtage
+        .whereRaw("tweet REGEXP '^#" + req.params.hashtag + "' OR tweet REGEXP ' #" + req.params.hashtag + "'")
+
+        //other params
+        .orderBy('created','desc')
+        .limit(limit)
+        .offset(offset)
+        .select('tweet','username','name','created','users.id as userID').then(tweets => {
+        res.status(200).json({tweets:tweets});
+    }).catch(error => {
+
+        //All other errors return 500
+        res.status(500).json({ error });
+    });
+});
+
+app.get('/api/users/:id', (req, res) => {
+    let id = parseInt(req.params.id);
+    // get user record
+    knex('users').where('id',id).first().select('username','name','id').then(user => {
+        res.status(200).json({user:user});
+    }).catch(error => {
+        res.status(500).json({ error });
+    });
+});
+
+
+
 app.listen(3000, () => console.log ('Server listening on port 3000'));

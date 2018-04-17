@@ -3,13 +3,20 @@
         <ul id="menu">
             <li><img src="/static/images/red-bird.png"/></li>
             <li><router-link to="/">Home</router-link></li>
-            <li class="right" v-if="loggedIn"><a @click="logout" href="#">Logout</a></li>
-            <li class="right" v-if="loggedIn">{{user.username}}</li>
-            <form v-else class="right" v-on:submit.prevent="login">
-                <input v-model="email" placeholder="Email Address">
-                <input v-model="password" placeholder="Password">
-                <button class="primary" type="submit">Login</button>
-            </form>
+            <li><form v-on:submit.prevent="search">
+                <input v-model="keywords" placeholder="Search">
+                <a href="#" v-on:click="search" class="search"><i class="fas fa-search"></i></a>
+            </form></li>
+            <li class="right" v-if="loggedIn">
+                <router-link :to="{ name: 'UserPage', params: {userID: user.id}}">{{user.username}}</router-link> <a @click="logout" href="#">Logout</a></p>
+            </li>
+            <li class="right" v-else>
+                <form v-on:submit.prevent="login">
+                    <input v-model="email" placeholder="Email Address">
+                    <input v-model="password" type="password" placeholder="Password">
+                    <button class="primary" type="submit">Login</button>
+                </form>
+            </li>
         </ul>
         <div class="flexWrapper errorPlace">
             <p v-if="loginError" class="flexRight error">{{loginError}}</p>
@@ -21,7 +28,8 @@
     export default {
         name: 'AppHeader',
         data () {
-            return {
+            return{
+                keywords: '',
                 email: '',
                 password: '',
             }
@@ -49,7 +57,11 @@
             },
             logout: function() {
                 this.$store.dispatch('logout');
-            }
+            },
+            search: function(){
+                this.$router.push({path: '/search', query: {keywords: this.keywords}})
+                this.keywords = '';
+            },
         }
     }
 </script>
@@ -74,6 +86,12 @@
         text-align: center;
         line-height: 50px;
         color: #666;
+    }
+    input {
+        height: 0.5em;
+    }
+    .search{
+        margin-left: 5px;
     }
     /*Active color*/
     li a.active {
